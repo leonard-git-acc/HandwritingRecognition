@@ -23,6 +23,7 @@ namespace HandwritingRecognition
         private bool loading;
         private int ImageSize = 28;
         private int count;
+        private int good=0;// kleine Statistik um die Akkuratheit zu messen
         private int outputNum;
         private Thread trainThread;
 
@@ -69,7 +70,12 @@ namespace HandwritingRecognition
             }
             float[] output = Brain.Think(ParseDatabase.ByteToFloat(Images[count]));
             outputNum = Training.OutputNumber(output);
-            outputNum_label.Text = outputNum.ToString();
+
+
+            if (Labels[count] == outputNum) good++;
+            float accuracy = good / (count + 1);
+            Console.Write(" accuracy: " + accuracy + "\r");
+            outputNum_label.Text = outputNum+ " accuracy: " + accuracy;
             show_output(output);
 
             this.Refresh();
@@ -87,13 +93,20 @@ namespace HandwritingRecognition
                 outputNum = Training.OutputNumber(output);
                 float cost = Training.CalculateCost(output, Labels[count]);
                 Training.Backpropagate(Brain, tweakAmount, outputNum, Labels[count]);
+                int expected = Labels[count];
 
-                Console.WriteLine(cost);
+                // Normalerweise trennt man die Prüfdaten von den Trainingsdaten,
+                // um zu gucken ob das Netz nicht nur auswendig lernt, sondern auch generalisiert
+                if (count % 1000 == 0) good = 0; //reset statistic every 1000 steps
+                if (expected == outputNum) good++;
+                double accuracy = good / (count%1000+1.0);
+                int percent = (int) (100 * accuracy);
+                Console.Write("accuracy: "+percent+"% cost: "+cost+" \r");
 
                 this.Invoke(new MethodInvoker(delegate {
                     this.Refresh();
-                    outputNum_label.Text = outputNum.ToString();
-                    show_output(output); 
+                    outputNum_label.Text =outputNum + " accuracy: " + percent+ "%";
+                    //show_output(output); 
                 }));
 
                 count++;
