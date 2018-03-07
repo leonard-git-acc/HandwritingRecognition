@@ -40,8 +40,8 @@ namespace HandwritingRecognition
 
             void loadData()
             {
-                Images = ParseDatabase.ParseImages(Application.StartupPath + @"\train-images-idx3-ubyte");
-                Labels = ParseDatabase.ParseLabels(Application.StartupPath + @"\train-labels-idx1-ubyte");
+                Images = ParseDatabase.ParseImages( @"train-images-idx3-ubyte");
+                Labels = ParseDatabase.ParseLabels( @"train-labels-idx1-ubyte");
 
                 loading = false;
             }
@@ -101,7 +101,7 @@ namespace HandwritingRecognition
                 if (count >= 59999)
                 {
                     count = 0;
-                    string path = Application.StartupPath + @"\save.brain";
+                    string path =  @"save.brain";
                     File.Create(path).Close();
                     File.WriteAllText(path, Brain.BrainStructure);
 
@@ -126,7 +126,7 @@ namespace HandwritingRecognition
 
         private void button1_Click(object sender, EventArgs e)
         {
-            string path = Application.StartupPath + @"\save.brain";
+            string path = @"save.brain";
             File.Create(path).Close();
             File.WriteAllText(path, Brain.StringifyBrainStructure());
         }
