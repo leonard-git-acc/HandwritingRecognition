@@ -122,7 +122,7 @@ namespace Simulation
                         }
                         else
                         {
-                            float delta_i = Delta_i(neuron, targetOutput[neuronNum], (float)Math.Tanh(neuron.Activation));
+                            float delta_i = Delta_i(neuron, targetOutput[neuronNum], Neuron.ReLU(neuron.Activation));
                             float activation_j = brain.AllLayers[layerNum][i].Activation;
                             deltaW = DeltaW(TweakAmount, delta_i, activation_j);
                         }
@@ -148,7 +148,7 @@ namespace Simulation
 
         private static float Delta_i(Neuron neuron, float targetOutput, float currentOutput)
         {
-            neuron.Delta_i = derivative(neuron.Activation) * (targetOutput - currentOutput);
+            neuron.Delta_i = derivative_ReLU(neuron.Activation) * (targetOutput - currentOutput);
             return neuron.Delta_i;
         }
 
@@ -163,16 +163,26 @@ namespace Simulation
                 Neuron prevNeuron = layers[prevLayer][i];
                 sum += prevNeuron.Delta_i * prevNeuron.Weight[targetNeuron];
             }
-            neuron.Delta_i = derivative(neuron.Activation) * sum;
+            neuron.Delta_i = derivative_ReLU(neuron.Activation) * sum;
 
             return neuron.Delta_i;
         }
 
-        private static float derivative(float x)
+        private static float derivative_tanh(float x)
         {
-            //return (float)((4 * Math.Pow(Math.E, 2 * x + 2)) / Math.Pow(Math.Pow(Math.E, 2 * x) + Math.Pow(Math.E, 2), 2));
             return (float)((1 - Math.Tanh(x)));
-            return Neuron.Sigmoid(x) * (1 - Neuron.Sigmoid(x));
+        }
+
+        private static float derivative_ReLU(double x)
+        {
+            if(x > 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

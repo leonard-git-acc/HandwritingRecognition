@@ -51,7 +51,8 @@ namespace Simulation
             for (int i = 0; i < Outputs.Length; i++)
             {
                 //output[i] = Neuron.Sigmoid(Outputs[i].Activation);
-                output[i] = (float)Math.Tanh(Outputs[i].Activation);
+                output[i] = Neuron.ReLU(Outputs[i].Activation);
+                //output[i] = (float)Math.Tanh(Outputs[i].Activation);
             }
             return output;
         }
@@ -376,8 +377,6 @@ namespace Simulation
             if (Type == NeuronType.InputNeuron)
             {
                 Activation = value;
-                if (value == 0)
-                    Activation = -1;
                 SendValue();
             }
 
@@ -404,7 +403,11 @@ namespace Simulation
         {
             for (int i = 0; i < OutputConnections.Length; i++)
             {
-                OutputConnections[i].SetValue(this, (float)Math.Tanh(Activation));//Sigmoid(Activation));
+                if (!float.IsNaN(ReLU(Activation)))
+                    OutputConnections[i].SetValue(this, ReLU(Activation));
+                else
+                    OutputConnections[i].SetValue(this, 0);
+                //OutputConnections[i].SetValue(this, (float)Math.Tanh(Activation));//Sigmoid(Activation));
                 //OutputConnections[i].SetValue(this, Sigmoid(Activation));
             }
         }
@@ -412,6 +415,11 @@ namespace Simulation
         public static float Sigmoid(double x) // sigmoid function
         {
             return (float)(1 / (1 + Math.Exp(-x)));
+        }
+
+        public  static float ReLU(double x)
+        {
+            return (float)Math.Max(0, x);
         }
 
         public object Clone()

@@ -21,9 +21,10 @@ namespace HandwritingRecognition
         public byte[] Labels;
 
         private bool loading;
+        private bool display;
         private int ImageSize = 28;
         private int count;
-        private int good=0;// kleine Statistik um die Akkuratheit zu messen
+        private int good = 0;// kleine Statistik um die Akkuratheit zu messen
         private int outputNum;
         private Thread trainThread;
 
@@ -103,11 +104,14 @@ namespace HandwritingRecognition
                 int percent = (int) (100 * accuracy);
                 Console.Write("accuracy: "+percent+"% cost: "+cost+" \r");
 
-                this.Invoke(new MethodInvoker(delegate {
-                    this.Refresh();
-                    outputNum_label.Text =outputNum + " accuracy: " + percent+ "%";
-                    //show_output(output); 
-                }));
+                if(display)
+                {
+                    this.Invoke(new MethodInvoker(delegate {
+                        this.Refresh();
+                        outputNum_label.Text =outputNum + " accuracy: " + percent+ "%";
+                        show_output(output); 
+                    }));
+                }
 
                 count++;
 
@@ -137,11 +141,16 @@ namespace HandwritingRecognition
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void save_button_Click(object sender, EventArgs e)
         {
             string path = @"save.brain";
             File.Create(path).Close();
             File.WriteAllText(path, Brain.StringifyBrainStructure());
+        }
+
+        private void display_checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            display = display_checkBox.Checked;
         }
     }
 }

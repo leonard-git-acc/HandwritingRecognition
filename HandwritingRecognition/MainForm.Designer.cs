@@ -30,8 +30,9 @@
         {
             this.train_button = new System.Windows.Forms.Button();
             this.outputNum_label = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.save_button = new System.Windows.Forms.Button();
             this.output_label = new System.Windows.Forms.Label();
+            this.display_checkBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // train_button
@@ -44,24 +45,24 @@
             this.train_button.UseVisualStyleBackColor = true;
             this.train_button.Click += new System.EventHandler(this.train_button_Click);
             // 
-            // cost_label
+            // outputNum_label
             // 
             this.outputNum_label.AutoSize = true;
             this.outputNum_label.Location = new System.Drawing.Point(474, 345);
-            this.outputNum_label.Name = "cost_label";
+            this.outputNum_label.Name = "outputNum_label";
             this.outputNum_label.Size = new System.Drawing.Size(34, 13);
             this.outputNum_label.TabIndex = 1;
             this.outputNum_label.Text = "Cost: ";
             // 
-            // button1
+            // save_button
             // 
-            this.button1.Location = new System.Drawing.Point(396, 361);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.save_button.Location = new System.Drawing.Point(396, 361);
+            this.save_button.Name = "save_button";
+            this.save_button.Size = new System.Drawing.Size(75, 23);
+            this.save_button.TabIndex = 2;
+            this.save_button.Text = "Save";
+            this.save_button.UseVisualStyleBackColor = true;
+            this.save_button.Click += new System.EventHandler(this.save_button_Click);
             // 
             // output_label
             // 
@@ -72,13 +73,25 @@
             this.output_label.Size = new System.Drawing.Size(0, 25);
             this.output_label.TabIndex = 3;
             // 
+            // display_checkBox
+            // 
+            this.display_checkBox.AutoSize = true;
+            this.display_checkBox.Location = new System.Drawing.Point(396, 345);
+            this.display_checkBox.Name = "display_checkBox";
+            this.display_checkBox.Size = new System.Drawing.Size(60, 17);
+            this.display_checkBox.TabIndex = 4;
+            this.display_checkBox.Text = "Display";
+            this.display_checkBox.UseVisualStyleBackColor = true;
+            this.display_checkBox.CheckedChanged += new System.EventHandler(this.display_checkBox_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(564, 396);
+            this.Controls.Add(this.display_checkBox);
             this.Controls.Add(this.output_label);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.save_button);
             this.Controls.Add(this.outputNum_label);
             this.Controls.Add(this.train_button);
             this.DoubleBuffered = true;
@@ -95,8 +108,9 @@
 
         private System.Windows.Forms.Button train_button;
         private System.Windows.Forms.Label outputNum_label;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button save_button;
         private System.Windows.Forms.Label output_label;
+        private System.Windows.Forms.CheckBox display_checkBox;
     }
 }
 
