@@ -24,7 +24,9 @@ namespace HandwritingRecognition
             Pad = new DrawPad();
             Pad.Location = new Point(10, 10);
             Pad.Size = new Size(500, 500);
-            Pad.BackColor = Color.Gray;
+            Pad.ImageSize = new Size(300, 300);
+            Pad.LineWidth = 13;
+            Pad.BackColor = Color.Black;
             Controls.Add(Pad);
         }
 
@@ -36,7 +38,13 @@ namespace HandwritingRecognition
 
         private void ok_button_Click(object sender, EventArgs e)
         {
-            float[] output = Brain.Think(Pad.ImageToFloat());
+            Pad.RescaleImage(28, 28);
+            Pad.CenterImage();
+            Pad.Image.Save(@"img.png");
+            Pad.Refresh();
+
+            float[] input = Pad.ImageToFloat();
+            float[] output = Brain.Think(input);
             out_label.Text = Training.OutputNumber(output).ToString();
             output_label.Text = string.Empty;
 
@@ -44,8 +52,6 @@ namespace HandwritingRecognition
             {
                 output_label.Text += i + ": " + output[i].ToString("0.00") + "\n";
             }
-
-            Pad.Image.Save(@"img.png");
         }
 
         private void reset_button_Click(object sender, EventArgs e)
