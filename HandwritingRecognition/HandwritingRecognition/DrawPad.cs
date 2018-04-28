@@ -128,24 +128,40 @@ namespace HandwritingRecognition
                 }
             }
 
-            int newHeight = Image.Height - Image.Height / 5;
-            int newWidth = newHeight * img.Width / img.Height;
+            int newHeight = 20;//Convert.ToInt32(Image.Height - Image.Height / 3.5);
+            int newWidth = Math.Min(newHeight * img.Width / img.Height, 20);
 
             img = new Bitmap(img, newWidth, newHeight);
             Image = new Bitmap(Image.Width, Image.Height);
+
+            //calculate center of mass
+            float meanX = 0;
+            float meanY = 0;
+            for (int y = 0; y < img.Height; y++)
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                    meanX += x * (img.GetPixel(x, y).A / 255.0F + 0.75F);
+                    meanY += y * (img.GetPixel(x, y).A / 255.0F + 0.75F);
+                }
+            }
+            meanX = meanX / (img.Height * img.Width);
+            meanY = meanY / (img.Height * img.Width);
 
             for (int y = 0; y < img.Height; y++)
             {
                 for (int x = 0; x < img.Width; x++)
                 {
-                    Image.SetPixel(x + ((Image.Width - newWidth) / 2 + 1), y + ((Image.Height - newHeight) / 2 + 1), img.GetPixel(x, y));
+                    Image.SetPixel(Math.Min(x + Convert.ToInt32(Image.Width / 2 - meanX), Image.Width - 1),
+                                   Math.Min(y + Convert.ToInt32(Image.Height / 2 - meanY), Image.Height - 1),
+                                   img.GetPixel(x, y));
                 }
             }
         }
 
         public float[] ImageToFloat()
         {
-            float[] img = new float[Image.Height * Image.Height];
+            float[] img = new float[Image.Height * Image.Width];
             int pixelCount = 0;
 
             for (int y = 0; y < Image.Height; y++)
@@ -181,7 +197,8 @@ namespace HandwritingRecognition
                 int imgX = Math.Max(Math.Min(Convert.ToInt32((float)e.Location.X * imageSize.Width / Size.Width), Image.Width - 1), 0);
                 int imgY = Math.Max(Math.Min(Convert.ToInt32((float)e.Location.Y * imageSize.Height / Size.Height), Image.Height - 1), 0);
 
-                CircleBresenham(Image, imgX, imgY, LineWidth, black);
+                //CircleBresenham(Image, imgX, imgY, LineWidth, black);
+                DrawCircle(Image, imgX, imgY, LineWidth, black);
 
                 this.Refresh();
             }
@@ -229,6 +246,12 @@ namespace HandwritingRecognition
             {
                 return Math.Min(Math.Max(val, 0), img.Height - 1);
             }
+        }
+
+        private void DrawCircle(Bitmap img, int x, int y, int radius, Color color)
+        {
+            Graphics e = Graphics.FromImage(img);
+            e.FillEllipse(new SolidBrush(color), new Rectangle(x - radius, y - radius, radius * 2, radius * 2));
         }
     }
 }
