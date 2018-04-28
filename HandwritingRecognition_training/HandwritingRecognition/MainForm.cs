@@ -22,8 +22,10 @@ namespace HandwritingRecognition
 
         private bool loading;
         private bool display;
+        private bool trainingActive;
         private int ImageSize = 28;
         private int count;
+        private int trainingAmount = 60000;
         private int good = 0;// kleine Statistik um die Akkuratheit zu messen
         private int outputNum;
         private Thread trainThread;
@@ -36,14 +38,24 @@ namespace HandwritingRecognition
         private void MainForm_Load(object sender, EventArgs e)
         {
             loading = true;
-            Brain = new Brain(28 * 28, 10, 2, 16);
+            Brain = new Brain(new FileStream(@"save.brainStream", FileMode.Open));//new Brain(28 * 28, 10, 3, 16);
             Thread loadThread = new Thread(new ThreadStart(loadData));
             loadThread.Start();
 
+            trainingActive = true;
+
             void loadData()
             {
-                Images = ParseDatabase.ParseImages( @"train-images-idx3-ubyte");
-                Labels = ParseDatabase.ParseLabels( @"train-labels-idx1-ubyte");
+                if(trainingActive)
+                {
+                    Images = ParseDatabase.ParseImages( @"train-images.idx3-ubyte", trainingAmount);
+                    Labels = ParseDatabase.ParseLabels( @"train-labels.idx1-ubyte", trainingAmount);
+                }
+                else
+                {
+                    Images = ParseDatabase.ParseImages(@"t10k-images.idx3-ubyte", trainingAmount);
+                    Labels = ParseDatabase.ParseLabels(@"t10k-labels.idx1-ubyte", trainingAmount);
+                }
 
                 loading = false;
             }
@@ -84,7 +96,7 @@ namespace HandwritingRecognition
 
         private void training()
         {
-            float tweakAmount = 0.001F;
+            float tweakAmount = 0.0005F;
             count = 0;
             bool Active = true;
 
@@ -100,7 +112,7 @@ namespace HandwritingRecognition
                 // um zu gucken ob das Netz nicht nur auswendig lernt, sondern auch generalisiert
                 if (count % 1000 == 0) good = 0; //reset statistic every 1000 steps
                 if (expected == outputNum) good++;
-                double accuracy = good / (count%1000+1.0);
+                double accuracy = good / (count % 1000 + 1.0);
                 int percent = (int) (100 * accuracy);
                 Console.Write("accuracy: "+percent+"% cost: "+cost+" \r");
 
@@ -115,7 +127,7 @@ namespace HandwritingRecognition
 
                 count++;
 
-                if (count >= 59999)
+                if (count >= trainingAmount - 1)
                 {
                     count = 0;
                     string path =  @"save.brain";
@@ -143,9 +155,14 @@ namespace HandwritingRecognition
 
         private void save_button_Click(object sender, EventArgs e)
         {
-            string path = @"save.brain";
+            /*string path = @"save.brain";
             File.Create(path).Close();
-            File.WriteAllText(path, Brain.StringifyBrainStructure());
+            File.WriteAllText(path, Brain.StringifyBrainStructure());*/
+
+            FileStream fstream = new FileStream(@"save.brainStream", FileMode.Create);
+            MemoryStream stream = Brain.BuildStructureStream();
+            stream.WriteTo(fstream);
+            fstream.Close();
         }
 
         private void display_checkBox_CheckedChanged(object sender, EventArgs e)
