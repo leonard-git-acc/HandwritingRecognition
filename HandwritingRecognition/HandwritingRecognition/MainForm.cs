@@ -36,12 +36,12 @@ namespace HandwritingRecognition
             Brain = new Brain(structure, 28 * 28, 10, 3, 16);
         }
 
-        private void ok_button_Click(object sender, EventArgs e)
+        private void Ok_button_Click(object sender, EventArgs e)
         {
             Pad.RescaleImage(28, 28);
             Pad.CenterImage();
             Pad.Image.Save(@"img.png");
-            Pad.Refresh();
+            //Pad.Refresh();
 
             float[] input = Pad.ImageToFloat();
             float[] output = Brain.Think(input);
@@ -54,7 +54,7 @@ namespace HandwritingRecognition
             }
         }
 
-        private void reset_button_Click(object sender, EventArgs e)
+        private void Reset_button_Click(object sender, EventArgs e)
         {
             Pad.ResetImage();
         }

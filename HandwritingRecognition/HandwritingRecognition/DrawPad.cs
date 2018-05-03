@@ -11,6 +11,7 @@ namespace HandwritingRecognition
     class DrawPad : Control
     {
         public Bitmap Image { get; set; }
+        public Bitmap DisplayImage { get; set; }
         public Size ImageSize { get => imageSize; set => OnImageResize(value); }
         public int LineWidth;
 
@@ -30,14 +31,8 @@ namespace HandwritingRecognition
         {
             this.Image = new Bitmap(imageSize.Width, imageSize.Height);
 
-            for (int y = 0; y < imageSize.Height; y++)
-            {
-                for (int x = 0; x < imageSize.Width; x++)
-                {
-                    Image.SetPixel(x, y, Color.FromArgb(0, 0, 0, 0));
-                }
-            }
 
+            this.DisplayImage = this.Image;
             this.Refresh();
         }
 
@@ -137,25 +132,40 @@ namespace HandwritingRecognition
             //calculate center of mass
             float meanX = 0;
             float meanY = 0;
-            for (int y = 0; y < img.Height; y++)
-            {
-                for (int x = 0; x < img.Width; x++)
-                {
-                    meanX += x * (img.GetPixel(x, y).A / 255.0F + 0.75F);
-                    meanY += y * (img.GetPixel(x, y).A / 255.0F + 0.75F);
-                }
-            }
-            meanX = meanX / (img.Height * img.Width);
-            meanY = meanY / (img.Height * img.Width);
+            float mass = 0;
 
             for (int y = 0; y < img.Height; y++)
             {
                 for (int x = 0; x < img.Width; x++)
                 {
-                    Image.SetPixel(Math.Min(x + Convert.ToInt32(Image.Width / 2 - meanX), Image.Width - 1),
-                                   Math.Min(y + Convert.ToInt32(Image.Height / 2 - meanY), Image.Height - 1),
+                    float value = img.GetPixel(x, y).A / 255.0F;
+                    meanX += x * value;
+                    meanY += y * value;
+                    mass += value;
+                }
+            }
+            meanX = meanX / mass;
+            meanY = meanY / mass;
+
+            img.SetPixel((int)meanX, (int)meanY, Color.Green);
+
+            for (int y = 0; y < img.Height; y++)
+            {
+                for (int x = 0; x < img.Width; x++)
+                {
+                  
+
+                    Image.SetPixel(maxMin(x + Convert.ToInt32(Image.Width / 2 - meanX), Image.Width - 1, 0),
+                                   maxMin(y + Convert.ToInt32(Image.Height / 2 - meanY), Image.Height - 1, 0),
                                    img.GetPixel(x, y));
                 }
+            }
+
+            //Image.SetPixel((int)(Image.Width / 2 - meanX), (int)(Image.Height - meanY), Color.Red);
+
+            int maxMin(int val, int max, int min)
+            {
+                return Math.Max(Math.Min(val, max), min);
             }
         }
 
@@ -180,7 +190,7 @@ namespace HandwritingRecognition
         private void OnPaint(object sender, PaintEventArgs e)
         {
             e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            e.Graphics.DrawImage(Image, 0, 0, Size.Width, Size.Height);
+            e.Graphics.DrawImage(DisplayImage, 0, 0, Size.Width, Size.Height);
         }
 
         private void OnImageResize(Size _size)
@@ -193,13 +203,14 @@ namespace HandwritingRecognition
         {
             if(e.Button == MouseButtons.Left)
             {
+                Image = DisplayImage;
                 Color black = Color.FromArgb(255, 255, 255, 255);
                 int imgX = Math.Max(Math.Min(Convert.ToInt32((float)e.Location.X * imageSize.Width / Size.Width), Image.Width - 1), 0);
                 int imgY = Math.Max(Math.Min(Convert.ToInt32((float)e.Location.Y * imageSize.Height / Size.Height), Image.Height - 1), 0);
 
                 //CircleBresenham(Image, imgX, imgY, LineWidth, black);
                 DrawCircle(Image, imgX, imgY, LineWidth, black);
-
+                DisplayImage = Image;
                 this.Refresh();
             }
         }
