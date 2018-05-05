@@ -22,18 +22,19 @@ namespace HandwritingRecognition
             InitializeComponent();
 
             Pad = new DrawPad();
-            Pad.Location = new Point(10, 10);
-            Pad.Size = new Size(500, 500);
-            Pad.ImageSize = new Size(300, 300);
-            Pad.LineWidth = 13;
+            Pad.Location = new Point(0, 0);
+            Pad.Size = new Size(600, 600);
+            Pad.ImageSize = new Size(600, 600);
+            Pad.LineWidth = 25;
             Pad.BackColor = Color.Black;
             Controls.Add(Pad);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            string structure = File.ReadAllText(@"network.brain");
-            Brain = new Brain(structure, 28 * 28, 10, 3, 16);
+            //string structure = File.ReadAllText(@"network.brain");
+            //Brain = new Brain(structure, 28 * 28, 10, 3, 16);
+            Brain = new Brain(new FileStream(@"network.brainStream", FileMode.Open));
         }
 
         private void Ok_button_Click(object sender, EventArgs e)
@@ -41,7 +42,6 @@ namespace HandwritingRecognition
             Pad.RescaleImage(28, 28);
             Pad.CenterImage();
             Pad.Image.Save(@"img.png");
-            //Pad.Refresh();
 
             float[] input = Pad.ImageToFloat();
             float[] output = Brain.Think(input);
@@ -57,6 +57,18 @@ namespace HandwritingRecognition
         private void Reset_button_Click(object sender, EventArgs e)
         {
             Pad.ResetImage();
+        }
+
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            int padsize = this.Height;
+            Pad.Size = new Size(padsize, padsize);
+
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                FormBorderStyle = FormBorderStyle.None;
+                WindowState = FormWindowState.Maximized;
+            }
         }
     }
 }

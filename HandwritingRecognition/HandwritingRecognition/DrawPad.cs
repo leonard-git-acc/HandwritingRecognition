@@ -13,25 +13,30 @@ namespace HandwritingRecognition
         public Bitmap Image { get; set; }
         public Bitmap DisplayImage { get; set; }
         public Size ImageSize { get => imageSize; set => OnImageResize(value); }
-        public int LineWidth;
+        public int LineWidth { get; set; }
+        public bool AlreadyDrawn { get; set; }
 
         private Size imageSize;
+        private Graphics ImageGraphics;
 
         public DrawPad()
         {
             this.imageSize = new Size(10, 10);
             this.LineWidth = 10;
+            this.AlreadyDrawn = false;
             this.ResetImage();
             this.DoubleBuffered = true;
             this.Paint += OnPaint;
             this.MouseMove += OnMouseDraw;
+            this.MouseUp += OnMouseUp;
+            this.MouseDown += OnMouseDown;
         }
 
         public void ResetImage()
         {
             this.Image = new Bitmap(imageSize.Width, imageSize.Height);
 
-
+            this.AlreadyDrawn = false;
             this.DisplayImage = this.Image;
             this.Refresh();
         }
@@ -43,125 +48,126 @@ namespace HandwritingRecognition
 
         public void CenterImage()
         {
-            Bitmap img;
-            int xleft = Image.Width;
-            int xright = 0;
-            int ytop = Image.Height;
-            int ybottom = 0;
-
-            //xleft
-            for (int y = 0; y < Image.Height; y++)
+            if (AlreadyDrawn)
             {
-                for (int x = 0; x < Image.Width; x++)
-                {
-                    Color color = Image.GetPixel(x, y);
-                    if(color.A > 0)
-                    {
-                        if(x < xleft)
-                        {
-                            xleft = x;
-                        }
-                    }
-                }
-            }
+                Bitmap img;
+                int xleft = Image.Width;
+                int xright = 0;
+                int ytop = Image.Height;
+                int ybottom = 0;
 
-            //xright
-            for (int y = 0; y < Image.Height; y++)
-            {
-                for (int x = Image.Width - 1; x >= 0; x--)
-                {
-                    Color color = Image.GetPixel(x, y);
-                    if (color.A > 0)
-                    {
-                        if (x > xright)
-                        {
-                            xright = x;
-                        }
-                    }
-                }
-            }
-
-            //ytop
-            for (int x = 0; x < Image.Width; x++)
-            {
+                //xleft
                 for (int y = 0; y < Image.Height; y++)
                 {
-                    Color color = Image.GetPixel(x, y);
-                    if (color.A > 0)
+                    for (int x = 0; x < Image.Width; x++)
                     {
-                        if (y < ytop)
+                        Color color = Image.GetPixel(x, y);
+                        if (color.A > 0)
                         {
-                            ytop = y;
+                            if (x < xleft)
+                            {
+                                xleft = x;
+                            }
                         }
                     }
                 }
-            }
 
-            //yright
-            for (int x = 0; x < Image.Width; x++)
-            {
-                for (int y = Image.Height - 1; y >= 0; y--)
+                //xright
+                for (int y = 0; y < Image.Height; y++)
                 {
-                    Color color = Image.GetPixel(x, y);
-                    if (color.A > 0)
+                    for (int x = Image.Width - 1; x >= 0; x--)
                     {
-                        if (y > ybottom)
+                        Color color = Image.GetPixel(x, y);
+                        if (color.A > 0)
                         {
-                            ybottom = y;
+                            if (x > xright)
+                            {
+                                xright = x;
+                            }
                         }
                     }
                 }
-            }
 
-            img = new Bitmap(xright - xleft + 1, ybottom - ytop + 1);
-
-            for (int y = 0; y < img.Height; y++)
-            {
-                for (int x = 0; x < img.Width; x++)
+                //ytop
+                for (int x = 0; x < Image.Width; x++)
                 {
-                    img.SetPixel(x, y, Image.GetPixel(x + xleft, y + ytop));
+                    for (int y = 0; y < Image.Height; y++)
+                    {
+                        Color color = Image.GetPixel(x, y);
+                        if (color.A > 0)
+                        {
+                            if (y < ytop)
+                            {
+                                ytop = y;
+                            }
+                        }
+                    }
+                }
+
+                //yright
+                for (int x = 0; x < Image.Width; x++)
+                {
+                    for (int y = Image.Height - 1; y >= 0; y--)
+                    {
+                        Color color = Image.GetPixel(x, y);
+                        if (color.A > 0)
+                        {
+                            if (y > ybottom)
+                            {
+                                ybottom = y;
+                            }
+                        }
+                    }
+                }
+
+                img = new Bitmap(xright - xleft + 1, ybottom - ytop + 1);
+
+                for (int y = 0; y < img.Height; y++)
+                {
+                    for (int x = 0; x < img.Width; x++)
+                    {
+                        img.SetPixel(x, y, Image.GetPixel(x + xleft, y + ytop));
+                    }
+                }
+
+                int newHeight = 20;
+                int newWidth = Math.Min(newHeight * img.Width / img.Height, 20);
+
+                img = new Bitmap(img, newWidth, newHeight);
+                Image = new Bitmap(Image.Width, Image.Height);
+
+                //calculate center of mass
+                float meanX = 0;
+                float meanY = 0;
+                float mass = 0;
+
+                for (int y = 0; y < img.Height; y++)
+                {
+                    for (int x = 0; x < img.Width; x++)
+                    {
+                        float value = img.GetPixel(x, y).A / 255.0F;
+                        meanX += x * value;
+                        meanY += y * value;
+                        mass += value;
+                    }
+                }
+                meanX = meanX / mass;
+                meanY = meanY / mass;
+
+                img.SetPixel((int)meanX, (int)meanY, Color.Green);
+
+                for (int y = 0; y < img.Height; y++)
+                {
+                    for (int x = 0; x < img.Width; x++)
+                    {
+
+
+                        Image.SetPixel(maxMin(x + Convert.ToInt32(Image.Width / 2 - meanX), Image.Width - 1, 0),
+                                       maxMin(y + Convert.ToInt32(Image.Height / 2 - meanY), Image.Height - 1, 0),
+                                       img.GetPixel(x, y));
+                    }
                 }
             }
-
-            int newHeight = 20;//Convert.ToInt32(Image.Height - Image.Height / 3.5);
-            int newWidth = Math.Min(newHeight * img.Width / img.Height, 20);
-
-            img = new Bitmap(img, newWidth, newHeight);
-            Image = new Bitmap(Image.Width, Image.Height);
-
-            //calculate center of mass
-            float meanX = 0;
-            float meanY = 0;
-            float mass = 0;
-
-            for (int y = 0; y < img.Height; y++)
-            {
-                for (int x = 0; x < img.Width; x++)
-                {
-                    float value = img.GetPixel(x, y).A / 255.0F;
-                    meanX += x * value;
-                    meanY += y * value;
-                    mass += value;
-                }
-            }
-            meanX = meanX / mass;
-            meanY = meanY / mass;
-
-            img.SetPixel((int)meanX, (int)meanY, Color.Green);
-
-            for (int y = 0; y < img.Height; y++)
-            {
-                for (int x = 0; x < img.Width; x++)
-                {
-                  
-
-                    Image.SetPixel(maxMin(x + Convert.ToInt32(Image.Width / 2 - meanX), Image.Width - 1, 0),
-                                   maxMin(y + Convert.ToInt32(Image.Height / 2 - meanY), Image.Height - 1, 0),
-                                   img.GetPixel(x, y));
-                }
-            }
-
-            //Image.SetPixel((int)(Image.Width / 2 - meanX), (int)(Image.Height - meanY), Color.Red);
 
             int maxMin(int val, int max, int min)
             {
@@ -179,7 +185,7 @@ namespace HandwritingRecognition
                 for (int x = 0; x < Image.Width; x++)
                 {
                     Color color = Image.GetPixel(x, y);
-                    img[pixelCount] = (float) color.A / 255.0F;
+                    img[pixelCount] = (float)color.A / 255.0F;
                     pixelCount++;
                 }
             }
@@ -189,7 +195,7 @@ namespace HandwritingRecognition
 
         private void OnPaint(object sender, PaintEventArgs e)
         {
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
             e.Graphics.DrawImage(DisplayImage, 0, 0, Size.Width, Size.Height);
         }
 
@@ -199,20 +205,52 @@ namespace HandwritingRecognition
             this.ResetImage();
         }
 
+        Point? prevPoint = null;
         private void OnMouseDraw(object sender, MouseEventArgs e)
         {
-            if(e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
             {
                 Image = DisplayImage;
+                this.ImageGraphics = Graphics.FromImage(Image);
                 Color black = Color.FromArgb(255, 255, 255, 255);
-                int imgX = Math.Max(Math.Min(Convert.ToInt32((float)e.Location.X * imageSize.Width / Size.Width), Image.Width - 1), 0);
-                int imgY = Math.Max(Math.Min(Convert.ToInt32((float)e.Location.Y * imageSize.Height / Size.Height), Image.Height - 1), 0);
 
-                //CircleBresenham(Image, imgX, imgY, LineWidth, black);
-                DrawCircle(Image, imgX, imgY, LineWidth, black);
+                Point imgPoint = ConvertPoint(e.Location);
+
+                if (prevPoint != null)
+                    ImageGraphics.DrawLine(new Pen(new SolidBrush(black), LineWidth * 2), (Point)prevPoint, imgPoint);
+                DrawCircle(ImageGraphics, imgPoint.X, imgPoint.Y, LineWidth, black);
+
                 DisplayImage = Image;
+                prevPoint = imgPoint;
+                AlreadyDrawn = true;
                 this.Refresh();
             }
+        }
+
+        private void OnMouseUp(object sender, MouseEventArgs e)
+        {
+            prevPoint = null;
+        }
+
+        private void OnMouseDown(object sender, MouseEventArgs e)
+        {
+            //if (e.Button == MouseButtons.Left)
+            //{
+            //    this.ImageGraphics = Graphics.FromImage(Image);
+            //    Color black = Color.FromArgb(255, 255, 255, 255);
+            //    Point imgPoint = ConvertPoint(e.Location);
+            //    DrawCircle(ImageGraphics, imgPoint.X, imgPoint.Y, LineWidth, black);
+            //    prevPoint = imgPoint;
+            //    this.Refresh();
+            //}
+        }
+
+        private Point ConvertPoint(Point pt)
+        {
+            int x = Math.Max(Math.Min(Convert.ToInt32((float)pt.X * imageSize.Width / Size.Width), Image.Width - 1), 0);
+            int y = Math.Max(Math.Min(Convert.ToInt32((float)pt.Y * imageSize.Height / Size.Height), Image.Height - 1), 0);
+
+            return new Point(x, y);
         }
 
         private void CircleBresenham(Bitmap img, int xc, int yc, int radius, Color color)
@@ -259,10 +297,9 @@ namespace HandwritingRecognition
             }
         }
 
-        private void DrawCircle(Bitmap img, int x, int y, int radius, Color color)
+        private void DrawCircle(Graphics imgGraphics, int x, int y, int radius, Color color)
         {
-            Graphics e = Graphics.FromImage(img);
-            e.FillEllipse(new SolidBrush(color), new Rectangle(x - radius, y - radius, radius * 2, radius * 2));
+            imgGraphics.FillEllipse(new SolidBrush(color), new Rectangle(x - radius, y - radius, radius * 2, radius * 2));
         }
     }
 }
