@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skial="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms" 
+             xmlns:tt="clr-namespace:TouchTracking"
+             x:Class="HRmobile.MainPage">
+    <Grid BackgroundColor="White">
+
+        <skial:SKCanvasView x:Name="canvasView"
+                            PaintSurface="Canvas_Paint"/>
+
+        <Grid.Effects>
+            <tt:TouchEffect Capture="True"
+                                TouchAction="Grid_Touched"/>
+        </Grid.Effects>
+
+        <Button x:Name="OK_button"
+                VerticalOptions="End"
+                HorizontalOptions="End"
+                Text="OK"
+                Clicked="OK_button_Clicked"/>
+        
+        <Button x:Name="Reset_button"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                Text="Reset"
+                Clicked="Reset_button_Clicked"/>
+        
+        <Label x:Name="Output_label"
+               Text="_"
+               VerticalOptions="Start"
+               HorizontalOptions="End"
+               FontSize="100"
+               FontAttributes="Bold"/>
+        
+    </Grid>
+</ContentPage>

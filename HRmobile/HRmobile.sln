@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2043
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRmobile.Android", "HRmobile\HRmobile.Android\HRmobile.Android.csproj", "{562A979A-B56D-4A25-B075-3180618B8785}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HRmobile", "HRmobile\HRmobile\HRmobile.csproj", "{DBA84E27-129F-4701-A30C-D2C47C0ED408}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{562A979A-B56D-4A25-B075-3180618B8785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{562A979A-B56D-4A25-B075-3180618B8785}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{562A979A-B56D-4A25-B075-3180618B8785}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{562A979A-B56D-4A25-B075-3180618B8785}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{562A979A-B56D-4A25-B075-3180618B8785}.Release|Any CPU.Build.0 = Release|Any CPU
+		{562A979A-B56D-4A25-B075-3180618B8785}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DBA84E27-129F-4701-A30C-D2C47C0ED408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA84E27-129F-4701-A30C-D2C47C0ED408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA84E27-129F-4701-A30C-D2C47C0ED408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA84E27-129F-4701-A30C-D2C47C0ED408}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4440ED22-7181-4FF0-9E93-B401B7CAE15F}
+	EndGlobalSection
+EndGlobal
