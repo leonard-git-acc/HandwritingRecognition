@@ -48,7 +48,6 @@ namespace HRmobile
 
         float drawSize;
         bool saveImage = false;
-        string path;
         SKBitmap bitmap;
         SKImage image;
 
@@ -88,6 +87,10 @@ namespace HRmobile
                 //FileStream fstream = new FileStream("/storage/sdcard/Pictures/img.png", FileMode.Create);
                 //SKImage.FromBitmap(bitmap).Encode().AsStream().CopyTo(fstream);
                 //fstream.Close();
+            }
+            else
+            {
+                saveImage = false;
             }
         }
 
@@ -169,6 +172,12 @@ namespace HRmobile
             float[] output = neuralNetwork.Think(bmp);
             int result = Training.OutputNumber(output);
             Output_label.Text = result.ToString();
+
+            TotalOutput_label.Text = string.Empty;
+            for (int i = 0; i < output.Length; i++)
+            {
+                TotalOutput_label.Text += i + ": " + output[i].ToString("0.00") + "\n";
+            }
         }
 
     }

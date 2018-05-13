@@ -13,25 +13,49 @@
             <tt:TouchEffect Capture="True"
                                 TouchAction="Grid_Touched"/>
         </Grid.Effects>
+        
+        <!--Button Grid-->
+        <Grid VerticalOptions="End"
+              HorizontalOptions="End">
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="7*"/>
+                <RowDefinition Height="7*" />
+            </Grid.RowDefinitions>
+        
+            <Button x:Name="OK_button"
+                    Grid.Row="0"
+                    VerticalOptions="Fill"
+                    HorizontalOptions="Fill"
+                    Text="OK"
+                    Clicked="OK_button_Clicked"/>
 
-        <Button x:Name="OK_button"
-                VerticalOptions="End"
-                HorizontalOptions="End"
-                Text="OK"
-                Clicked="OK_button_Clicked"/>
-        
-        <Button x:Name="Reset_button"
-                VerticalOptions="Center"
-                HorizontalOptions="End"
-                Text="Reset"
-                Clicked="Reset_button_Clicked"/>
-        
+            <Button x:Name="Reset_button"
+                    Grid.Row="1"
+                    VerticalOptions="Fill"
+                    HorizontalOptions="Fill"
+                    Text="Reset"
+                    Clicked="Reset_button_Clicked"/>
+        </Grid>
+                
         <Label x:Name="Output_label"
                Text="_"
-               VerticalOptions="Start"
+               VerticalOptions="Center"
                HorizontalOptions="End"
-               FontSize="100"
-               FontAttributes="Bold"/>
-        
+               FontSize="150"
+               FontAttributes="Bold"
+               TextColor="Black"
+               Margin="130, 100"/>
+
+        <Label x:Name="TotalOutput_label"
+               FontSize="Large"
+               HorizontalOptions="End"
+               VerticalOptions="Start"
+               TextColor="Black"
+               Margin="20, 20">
+
+            <Label.Text>0: 0.00&#10;1: 0.00&#10;2: 0.00&#10;3: 0.00&#10;4: 0.00&#10;5: 0.00&#10;6: 0.00&#10;7: 0.00&#10;8: 0.00&#10;9: 0.00</Label.Text>
+        </Label> 
+
     </Grid>
 </ContentPage>
