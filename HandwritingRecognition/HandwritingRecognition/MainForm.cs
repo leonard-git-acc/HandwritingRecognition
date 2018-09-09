@@ -34,7 +34,7 @@ namespace HandwritingRecognition
         {
             //string structure = File.ReadAllText(@"network.brain");
             //Brain = new Brain(structure, 28 * 28, 10, 3, 16);
-            Brain = new Brain(new FileStream(@"network.brainStream", FileMode.Open));
+            Brain = new Brain(new FileStream(@"network.brainStream", FileMode.Open), Neuron.ReLU);
         }
 
         private void Ok_button_Click(object sender, EventArgs e)
@@ -44,7 +44,7 @@ namespace HandwritingRecognition
             Pad.Image.Save(@"img.png");
 
             float[] input = Pad.ImageToFloat();
-            float[] output = Brain.Think(input);
+            float[] output = Brain.Think(input, Neuron.ReLU);
             out_label.Text = Training.OutputNumber(output).ToString();
             output_label.Text = string.Empty;
 

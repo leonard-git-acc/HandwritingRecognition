@@ -26,6 +26,7 @@ namespace HandwritingRecognition
         private int ImageSize = 28;
         private int count;
         private int trainingAmount = 60000;
+        private int totalSuccess = 0;
         private int good = 0;// kleine Statistik um die Akkuratheit zu messen
         private int outputNum;
         private Thread trainThread;
@@ -38,7 +39,8 @@ namespace HandwritingRecognition
         private void MainForm_Load(object sender, EventArgs e)
         {
             loading = true;
-            Brain = new Brain(new FileStream(@"save.brainStream", FileMode.Open));//new Brain(28 * 28, 10, 3, 16);
+            Brain = new Brain(28 * 28, 10, 3, 16, -0.5F, 0.5F, false, Neuron.ReLU);
+            Brain = new Brain(new FileStream(@"network.brainStream", FileMode.Open), Neuron.ReLU);//new Brain(File.ReadAllText(@"network.brain"),28 * 28, 10, 3, 16);
             Thread loadThread = new Thread(new ThreadStart(loadData));
             loadThread.Start();
 
@@ -48,11 +50,13 @@ namespace HandwritingRecognition
             {
                 if(trainingActive)
                 {
+                    trainingAmount = 60000;
                     Images = ParseDatabase.ParseImages( @"train-images.idx3-ubyte", trainingAmount);
                     Labels = ParseDatabase.ParseLabels( @"train-labels.idx1-ubyte", trainingAmount);
                 }
                 else
                 {
+                    trainingAmount = 10000;
                     Images = ParseDatabase.ParseImages(@"t10k-images.idx3-ubyte", trainingAmount);
                     Labels = ParseDatabase.ParseLabels(@"t10k-labels.idx1-ubyte", trainingAmount);
                 }
@@ -81,7 +85,7 @@ namespace HandwritingRecognition
                 trainThread = new Thread(new ThreadStart(training));
                 trainThread.Start();
             }
-            float[] output = Brain.Think(ParseDatabase.ByteToFloat(Images[count]));
+            float[] output = Brain.Think(ParseDatabase.ByteToFloat(Images[count]), Neuron.ReLU);
             outputNum = Training.OutputNumber(output);
 
 
@@ -102,7 +106,7 @@ namespace HandwritingRecognition
 
             while (Active)
             {
-                float[] output = Brain.Think(ParseDatabase.ByteToFloat(Images[count]));
+                float[] output = Brain.Think(ParseDatabase.ByteToFloat(Images[count]), Neuron.ReLU);
                 outputNum = Training.OutputNumber(output);
                 float cost = Training.CalculateCost(output, Labels[count]);
                 Training.Backpropagate(Brain, tweakAmount, outputNum, Labels[count]);
@@ -111,10 +115,18 @@ namespace HandwritingRecognition
                 // Normalerweise trennt man die Prüfdaten von den Trainingsdaten,
                 // um zu gucken ob das Netz nicht nur auswendig lernt, sondern auch generalisiert
                 if (count % 1000 == 0) good = 0; //reset statistic every 1000 steps
-                if (expected == outputNum) good++;
+                if (expected == outputNum)
+                {
+                    totalSuccess++;
+                    good++;
+                }
+
                 double accuracy = good / (count % 1000 + 1.0);
                 int percent = (int) (100 * accuracy);
-                Console.Write("accuracy: "+percent+"% cost: "+cost+" \r");
+
+                int totalAccuracy = Convert.ToInt32(totalSuccess * 100 / (count + 1));
+
+                Console.Write("accuracy: " + percent + "% cost: "+ cost + "total:" + totalAccuracy +  "% \r");
 
                 if(display)
                 {
@@ -130,9 +142,10 @@ namespace HandwritingRecognition
                 if (count >= trainingAmount - 1)
                 {
                     count = 0;
+                    totalSuccess = 0;
                     string path =  @"save.brain";
                     File.Create(path).Close();
-                    File.WriteAllText(path, Brain.BrainStructure);
+                    File.WriteAllText(path, Brain.BrainStructureString);
 
                     DialogResult res = MessageBox.Show("Finished", "Training", MessageBoxButtons.OKCancel);
                     if (res.HasFlag(DialogResult.Cancel))

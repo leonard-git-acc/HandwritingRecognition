@@ -12,7 +12,7 @@ namespace HandwritingRecognition
 {
     static class ParseDatabase
     {
-        public static byte[][] ParseImages(string filePath)
+        public static byte[][] ParseImages(string filePath, int amount)
         {
             FileStream fileStream = new FileStream(filePath, FileMode.Open);
             BinaryReader binaryReader = new BinaryReader(fileStream);
@@ -22,7 +22,7 @@ namespace HandwritingRecognition
             int rowCount = binaryReader.ReadInt32();
             int columnsCount = binaryReader.ReadInt32();
 
-            byte[][] images = new byte[60000][];
+            byte[][] images = new byte[amount][];
 
             for (int iter = 0; iter < images.Length; iter++)
             {
@@ -40,7 +40,7 @@ namespace HandwritingRecognition
             return images;
         }
 
-        public static byte[] ParseLabels(string filePath)
+        public static byte[] ParseLabels(string filePath, int amount)
         {
             FileStream fileStream = new FileStream(filePath, FileMode.Open);
             BinaryReader binaryReader = new BinaryReader(fileStream);
@@ -48,7 +48,7 @@ namespace HandwritingRecognition
             int magicNum = binaryReader.ReadInt32();
             int labelCount = binaryReader.ReadInt32();
 
-            byte[] labels = new byte[60000];
+            byte[] labels = new byte[amount];
 
             for (int i = 0; i < labels.Length; i++)
             {

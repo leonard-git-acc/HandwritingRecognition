@@ -136,6 +136,7 @@ namespace HandwritingRecognition
                 img = new Bitmap(img, newWidth, newHeight);
                 Image = new Bitmap(Image.Width, Image.Height);
 
+
                 //calculate center of mass
                 float meanX = 0;
                 float meanY = 0;
@@ -154,7 +155,7 @@ namespace HandwritingRecognition
                 meanX = meanX / mass;
                 meanY = meanY / mass;
 
-                img.SetPixel((int)meanX, (int)meanY, Color.Green);
+                //img.SetPixel((int)meanX, (int)meanY, Color.Green);
 
                 for (int y = 0; y < img.Height; y++)
                 {
@@ -167,6 +168,7 @@ namespace HandwritingRecognition
                                        img.GetPixel(x, y));
                     }
                 }
+
             }
 
             int maxMin(int val, int max, int min)
