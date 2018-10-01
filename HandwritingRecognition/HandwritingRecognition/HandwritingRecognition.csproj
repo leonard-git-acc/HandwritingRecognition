@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Network\Brain.cs" />
     <Compile Include="DrawPad.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -55,6 +54,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Network\Brain.cs" />
     <Compile Include="Network\Random.cs" />
     <Compile Include="Network\Training.cs" />
     <Compile Include="Program.cs" />
